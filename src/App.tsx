@@ -5,11 +5,10 @@ import OnboardingStep1Screen from './screens/OnboardingStep1Screen.tsx';
 // --- Componente Principal da Aplicação ---
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState('welcome');
-
-    // Agora a função de navegação realmente MUDA a tela!
+    // Função para lidar com a navegação entre telas
     const handleNavigation = (screen: string) => {
         console.log(`Navegando para a tela: ${screen}`);
-        setCurrentScreen(screen); // Esta linha ativa a mágica
+        setCurrentScreen(screen); 
     };
 
     const renderScreen = () => {
