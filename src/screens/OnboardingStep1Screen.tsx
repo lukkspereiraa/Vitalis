@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Input from '../components/ui/Input';
 import GoalCard from '../components/features/onboarding/GoalCard';
 import Button from '../components/ui/Button';
+import GenderSelector from '../components/features/onboarding/GenderSelector';
 
 // --- Tipos ---
 type NavigationProps = {
@@ -11,6 +12,7 @@ type NavigationProps = {
 // --- Componente de Tela ---
 const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const [gender, setGender] = useState<'male' | 'female' | null>(null);
 
   return (
     <div className="min-h-screen flex flex-col p-8 font-sans w-full max-w-md mx-auto">
@@ -46,6 +48,10 @@ const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
               onClick={() => setSelectedGoal('gain')}
             />
           </div>
+
+          <GenderSelector selectedValue={gender} onSelect={setGender} />
+  
+        
         </div>
       </div>
       
