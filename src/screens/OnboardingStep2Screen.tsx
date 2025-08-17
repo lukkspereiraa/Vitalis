@@ -3,7 +3,6 @@ import Input from '../components/ui/Input.tsx';
 import Button from '../components/ui/Button.tsx';
 import Alert from '../components/ui/Alert.tsx';
 
-// --- Ícone de Voltar ---
 const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="m15 18-6-6 6-6"/>
@@ -11,15 +10,16 @@ const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 // --- Tipos ---
-type NavigationProps = {
-  onNavigate: (screen: string) => void;
+type OnboardingStep2Props = {
+  onNavigate: (screen: string, data?: object) => void;
+  userData: object; // Dados coletados até agora
 };
 
 // --- Componente de Tela ---
-const OnboardingStep2Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
+const OnboardingStep2Screen: React.FC<OnboardingStep2Props> = ({ onNavigate, userData }) => {
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
-  const [fatPercentage, setFatPercentage] = useState(''); // Opcional
+  const [fatPercentage, setFatPercentage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleNext = () => {
@@ -33,7 +33,8 @@ const OnboardingStep2Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
     }
     
     setErrorMessage('');
-    onNavigate('onboardingStep3');
+    const newData = { ...userData, height: Number(height), weight: Number(weight), fatPercentage: Number(fatPercentage) || null };
+    onNavigate('onboardingStep3', newData);
   };
 
   return (
@@ -66,7 +67,7 @@ const OnboardingStep2Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
           onChange={(e) => setFatPercentage(e.target.value)}
         />
       </div>
-
+      
       <div className="mt-auto pt-8 space-y-2">
         <Alert message={errorMessage} />
         <Button onClick={handleNext}>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import ActivityCard from '../components/features/onboarding/ActivityCard';
-import Button from '../components/ui/Button';
-import Alert from '../components/ui/Alert';
+import ActivityCard from '../components/features/onboarding/ActivityCard.tsx';
+import Button from '../components/ui/Button.tsx';
+import Alert from '../components/ui/Alert.tsx';
 
 // --- Ícone de Voltar ---
 const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -11,34 +11,37 @@ const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 // --- Tipos ---
-type NavigationProps = {
+type OnboardingStep3Props = {
+  onComplete: (data: object) => void; 
   onNavigate: (screen: string) => void;
+  userData: object; 
 };
 
 // --- Componente de Tela ---
-const OnboardingStep3Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
+const OnboardingStep3Screen: React.FC<OnboardingStep3Props> = ({ onComplete, onNavigate, userData }) => {
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-
-  const handleNext = () => {
+  const handleComplete = () => {
     if (!selectedActivity) {
       setErrorMessage('Por favor, selecione o seu nível de atividade.');
       return;
     }
     
-    // Se tudo estiver certo, limpa a mensagem de erro e navega
     setErrorMessage('');
-    onNavigate('dashboard');
+    const finalData = { ...userData, activityLevel: selectedActivity };
+    onComplete(finalData);
   };
 
   return (
     <div className="min-h-screen flex flex-col p-8 font-sans w-full max-w-md mx-auto">
+      {/* Cabeçalho da Tela */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-[#212121]">Nível de Atividade</h1>
         <p className="text-md text-[#757575]">Passo 3 de 3: Com que frequência você se exercita?</p>
       </div>
 
+      {/* Opções de Atividade */}
       <div className="space-y-4">
         <ActivityCard
           title="Sedentário"
@@ -66,9 +69,10 @@ const OnboardingStep3Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
         />
       </div>
       
+      {/* Botões de Navegação */}
       <div className="mt-auto pt-8 space-y-2">
         <Alert message={errorMessage} />
-        <Button onClick={handleNext}>
+        <Button onClick={handleComplete}>
           Concluir Cadastro
         </Button>
         <Button variant="secondary" onClick={() => onNavigate('onboardingStep2')}>

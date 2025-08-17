@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Input from '../components/ui/Input';
-import GoalCard from '../components/features/onboarding/GoalCard';
-import Button from '../components/ui/Button';
-import GenderSelector from '../components/features/onboarding/GenderSelector';
-import Alert from '../components/ui/Alert';
+import Input from '../components/ui/Input.tsx';
+import GoalCard from '../components/features/onboarding/GoalCard.tsx';
+import Button from '../components/ui/Button.tsx';
+import GenderSelector from '../components/features/onboarding/GenderSelector.tsx';
+import Alert from '../components/ui/Alert.tsx';
 
 const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -13,7 +13,7 @@ const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 // --- Tipos ---
 type NavigationProps = {
-  onNavigate: (screen: string) => void;
+  onNavigate: (screen: string, data?: object) => void;
 };
 
 // --- Componente de Tela ---
@@ -38,7 +38,7 @@ const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
     }
     
     setErrorMessage('');
-    onNavigate('onboardingStep2');
+    onNavigate('onboardingStep2', { name, gender, goal: selectedGoal });
   };
 
   return (
@@ -90,7 +90,7 @@ const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
         <Alert message={errorMessage} />
         <Button onClick={handleNext}>
           Avançar
-        </Button> 
+        </Button>
         <Button variant="secondary" onClick={() => onNavigate('welcome')}>
           <div className="flex items-center justify-center space-x-2">
             <ChevronLeftIcon />
