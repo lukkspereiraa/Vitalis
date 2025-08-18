@@ -2,21 +2,26 @@ import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import Button from '../../ui/Button';
+import type { NutritionGoals } from '../../../utils/nutritionCalculator';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 // --- Tipos ---
-type NavigationProps = {
+type NutritionCardProps = {
   onNavigate: (screen: string) => void;
+  goals: NutritionGoals | null;
 };
 
 // --- Componente ---
-const NutritionCard: React.FC<NavigationProps> = ({ onNavigate }) => {
+const NutritionCard: React.FC<NutritionCardProps> = ({ onNavigate, goals }) => {
+  // Dados de consumo do dia (por enquanto, fixos)
+  const consumed = { calories: 1250, protein: 80, carbs: 150, fat: 30 };
+
   const data = {
     labels: ['Proteínas', 'Carboidratos', 'Gorduras'],
     datasets: [
       {
-        data: [80, 150, 30], 
+        data: [consumed.protein, consumed.carbs, consumed.fat],
         backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
         borderColor: '#F8F7F4',
         borderWidth: 4,
@@ -28,10 +33,10 @@ const NutritionCard: React.FC<NavigationProps> = ({ onNavigate }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: '70%', 
+    cutout: '70%',
     plugins: {
       legend: {
-        display: false, 
+        display: false,
       },
     },
   };
@@ -42,21 +47,22 @@ const NutritionCard: React.FC<NavigationProps> = ({ onNavigate }) => {
       <div className="relative h-48 w-48 mx-auto">
         <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-3xl font-bold text-[#212121]">1250</span>
-          <span className="text-sm text-[#757575]">/ 2500 kcal</span>
+          <span className="text-3xl font-bold text-[#212121]">{consumed.calories}</span>
+          {/* Usamos a meta de calorias real! */}
+          <span className="text-sm text-[#757575]">/ {goals?.calories || 0} kcal</span>
         </div>
       </div>
       <div className="mt-4 flex justify-around text-center">
         <div>
-            <p className="font-bold text-emerald-600">80g</p>
+            <p className="font-bold text-emerald-600">{consumed.protein}g</p>
             <p className="text-sm text-gray-500">Proteínas</p>
         </div>
         <div>
-            <p className="font-bold text-amber-500">150g</p>
+            <p className="font-bold text-amber-500">{consumed.carbs}g</p>
             <p className="text-sm text-gray-500">Carbs</p>
         </div>
         <div>
-            <p className="font-bold text-red-500">30g</p>
+            <p className="font-bold text-red-500">{consumed.fat}g</p>
             <p className="text-sm text-gray-500">Gorduras</p>
         </div>
       </div>
