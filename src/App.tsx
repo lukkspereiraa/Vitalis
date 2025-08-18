@@ -1,30 +1,30 @@
-import  { useState } from 'react';
-import WelcomeScreen from './screens/WelcomeScreen';
-import OnboardingStep1Screen from './screens/OnboardingStep1Screen';
-import OnboardingStep2Screen from './screens/OnboardingStep2Screen';
-import OnboardingStep3Screen from './screens/OnboardingStep3Screen';
-import DashboardScreen from './screens/DashboardScreen';
-// 1. Importar o calculador e os tipos
-import { calculateNutritionGoals, type UserData, type NutritionGoals } from './utils/nutritionCalculator';
+import { useState } from 'react';
+import WelcomeScreen from './screens/WelcomeScreen.tsx';
+import OnboardingStep1Screen from './screens/OnboardingStep1Screen.tsx';
+import OnboardingStep2Screen from './screens/OnboardingStep2Screen.tsx';
+import OnboardingStep3Screen from './screens/OnboardingStep3Screen.tsx';
+import DashboardScreen from './screens/DashboardScreen.tsx';
+import { calculateNutritionGoals, type UserData, type NutritionGoals } from './utils/nutritionCalculator.ts';
 
-// --- Componente Principal da Aplicação ---
 export default function App() {
     const [currentScreen, setCurrentScreen] = useState('welcome');
-    // 2. Usar um estado mais estruturado para os dados do usuário
+    // Estado para guardar os dados do usuário durante o cadastro
     const [userData, setUserData] = useState<Partial<UserData>>({});
+    // Estado para guardar as metas calculadas
     const [nutritionGoals, setNutritionGoals] = useState<NutritionGoals | null>(null);
 
+    // Função para navegar entre as telas e juntar os dados do cadastro
     const handleNavigation = (screen: string, data: object = {}) => {
         setUserData(prevData => ({ ...prevData, ...data }));
         setCurrentScreen(screen);
     };
     
-    // 3. Função de finalização agora faz o cálculo!
+    // Função chamada no final do cadastro para calcular as metas
     const handleOnboardingComplete = (finalData: object) => {
         const fullUserData = { ...userData, ...finalData } as UserData;
         setUserData(fullUserData);
         
-        // Chamamos nosso calculador com os dados finais
+        // Usamos calculador com os dados finais
         const goals = calculateNutritionGoals(fullUserData);
         setNutritionGoals(goals);
         console.log('Metas calculadas:', goals);
@@ -32,6 +32,7 @@ export default function App() {
         setCurrentScreen('dashboard');
     };
 
+    // Função que decide qual tela renderizar
     const renderScreen = () => {
         switch (currentScreen) {
             case 'welcome':
@@ -43,7 +44,6 @@ export default function App() {
             case 'onboardingStep3':
               return <OnboardingStep3Screen onComplete={handleOnboardingComplete} onNavigate={handleNavigation} userData={userData} />;
             case 'dashboard':
-              // 4. Passamos os dados e as metas para o Dashboard
               return <DashboardScreen onNavigate={handleNavigation} userData={userData} goals={nutritionGoals} />;
             default:
                 return <WelcomeScreen onNavigate={handleNavigation} />;

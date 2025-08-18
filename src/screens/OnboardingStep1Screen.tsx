@@ -19,6 +19,7 @@ type NavigationProps = {
 // --- Componente de Tela ---
 const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
   const [name, setName] = useState('');
+  const [age, setAge] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -27,6 +28,10 @@ const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
     if (!name.trim()) {
       setErrorMessage('Por favor, preencha o seu nome.');
       return;
+    }
+    if (!age.trim() || Number(age) <= 0) {
+        setErrorMessage('Por favor, insira uma idade válida.');
+        return;
     }
     if (!gender) {
       setErrorMessage('Por favor, selecione o seu sexo.');
@@ -38,7 +43,7 @@ const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
     }
     
     setErrorMessage('');
-    onNavigate('onboardingStep2', { name, gender, goal: selectedGoal });
+    onNavigate('onboardingStep2', { name, age: Number(age), gender, goal: selectedGoal });
   };
 
   return (
@@ -56,7 +61,13 @@ const OnboardingStep1Screen: React.FC<NavigationProps> = ({ onNavigate }) => {
           value={name} 
           onChange={(e) => setName(e.target.value)} 
         />
-        
+        <Input 
+          label="Idade" 
+          type="number" 
+          placeholder="Ex: 25" 
+          value={age} 
+          onChange={(e) => setAge(e.target.value)} 
+        />
         <GenderSelector selectedValue={gender} onSelect={setGender} />
         
         <div>
