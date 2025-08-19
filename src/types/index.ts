@@ -15,6 +15,9 @@ export interface Food {
     id: number;
     name: string;
     quantity: string;
+    protein?: number; // Opcional
+    carbs?: number;   // Opcional
+    fat?: number;     // Opcional
 }
 
 // Define a estrutura de uma refeição, que contém vários alimentos
