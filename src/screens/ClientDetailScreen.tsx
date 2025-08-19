@@ -1,8 +1,9 @@
 import React from 'react';
 import Button from '../components/ui/Button';
 import DataPill from '../components/ui/DataPill';
-import type { Client } from '../types/index';
+import type { Client } from '../types';
 
+// --- Ícone de Voltar ---
 const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="m15 18-6-6 6-6"/>
@@ -11,11 +12,10 @@ const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 // --- Tipos ---
 type ClientDetailProps = {
-  client: Client | null; // Usar o tipo Client em vez de 'any'
+  client: Client | null;
   onNavigate: (screen: string) => void;
 };
 
-// --- Componente de Tela ---
 const ClientDetailScreen: React.FC<ClientDetailProps> = ({ client, onNavigate }) => {
   if (!client) {
     return (
@@ -28,12 +28,14 @@ const ClientDetailScreen: React.FC<ClientDetailProps> = ({ client, onNavigate })
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
+      {/* Cabeçalho - agora apenas com o título */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-[#212121]">{client.name}</h1>
         <p className="text-md text-[#757575]">Detalhes e progresso do cliente.</p>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md">
+      {/* Card com os dados do cliente */}
+      <div className="bg-white p-6 rounded-xl shadow-md mb-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Dados do Cadastro</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <DataPill label="Idade" value={`${client.age} anos`} />
@@ -45,7 +47,11 @@ const ClientDetailScreen: React.FC<ClientDetailProps> = ({ client, onNavigate })
         </div>
       </div>
       
-      <div className="mt-8">
+      {/* Botões de Ação - agora agrupados no final */}
+      <div className="space-y-2">
+        <Button variant="primary" onClick={() => onNavigate('createMealPlan')}>
+            Criar Plano Alimentar
+        </Button>
         <Button variant="secondary" onClick={() => onNavigate('professionalDashboard')}>
             <div className="flex items-center justify-center space-x-2">
                 <ChevronLeftIcon />

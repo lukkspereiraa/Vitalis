@@ -7,7 +7,8 @@ import OnboardingStep3Screen from './screens/OnboardingStep3Screen.tsx';
 import DashboardScreen from './screens/DashboardScreen.tsx';
 import ProfessionalDashboardScreen from './screens/ProfessionalDashboardScreen.tsx';
 import ClientDetailScreen from './screens/ClientDetailScreen.tsx';
-import { calculateNutritionGoals, type UserData, type NutritionGoals } from './utils/nutritionCalculator.ts';
+import CreateMealPlanScreen from './screens/CreateMealPlanScreen.tsx';
+import  { calculateNutritionGoals, type UserData, type NutritionGoals } from './utils/nutritionCalculator.ts';
 import type { Client } from './types/index.ts';
 
 export default function App() {
@@ -40,10 +41,8 @@ export default function App() {
     const handleOnboardingComplete = (finalData: object) => {
         const fullUserData = { ...userData, ...finalData } as UserData;
         setUserData(fullUserData);
-        
         const goals = calculateNutritionGoals(fullUserData);
         setNutritionGoals(goals);
-        
         setCurrentScreen('dashboard');
     };
 
@@ -58,6 +57,8 @@ export default function App() {
                     return <ProfessionalDashboardScreen onNavigate={handleNavigation} />;
                 case 'clientDetail':
                     return <ClientDetailScreen client={selectedClient} onNavigate={handleNavigation} />;
+                case 'createMealPlan':
+                    return <CreateMealPlanScreen client={selectedClient} onNavigate={handleNavigation} />;
                 default:
                     return <ProfessionalDashboardScreen onNavigate={handleNavigation} />;
             }
