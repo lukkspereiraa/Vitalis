@@ -66,7 +66,6 @@ const NutritionCard: React.FC<NutritionCardProps> = ({ onNavigate, goals }) => {
         </div>
       </div>
       <div className="mt-auto pt-6">
-        {/* CORREÇÃO AQUI: Mudamos 'nutritionDetail' para 'mealPlan' */}
         <Button onClick={() => onNavigate('mealPlan')}>
             Ver Diário Completo
         </Button>

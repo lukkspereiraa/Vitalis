@@ -8,15 +8,19 @@ import DashboardScreen from './screens/DashboardScreen.tsx';
 import ProfessionalDashboardScreen from './screens/ProfessionalDashboardScreen.tsx';
 import ClientDetailScreen from './screens/ClientDetailScreen.tsx';
 import CreateMealPlanScreen from './screens/CreateMealPlanScreen.tsx';
-import  { calculateNutritionGoals, type UserData, type NutritionGoals } from './utils/nutritionCalculator.ts';
-import type { Client } from './types/index.ts';
+import MealPlanScreen from './screens/MealPlanScreen.tsx';
+// Importando tipos e o calculador
+import { calculateNutritionGoals, type UserData, type NutritionGoals } from './utils/nutritionCalculator.ts';
+import type { Client, Meal } from './types/index.ts';
 
 export default function App() {
+    // Estado para o perfil selecionado (começa como nulo)
     const [userProfile, setUserProfile] = useState<'consumer' | 'professional' | null>(null);
-    const [currentScreen, setCurrentScreen] = useState('welcome');
+    const [currentScreen, setCurrentScreen] = useState('profileSelector');
     const [userData, setUserData] = useState<Partial<UserData>>({});
     const [nutritionGoals, setNutritionGoals] = useState<NutritionGoals | null>(null);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+    const [mealPlans, setMealPlans] = useState<Record<number, Meal[]>>({});
 
     const handleSelectProfile = (profile: 'consumer' | 'professional') => {
         setUserProfile(profile);
@@ -46,6 +50,14 @@ export default function App() {
         setCurrentScreen('dashboard');
     };
 
+    const handleSavePlan = (clientId: number, plan: Meal[]) => {
+        console.log(`Salvando plano para o cliente ${clientId}:`, plan);
+        setMealPlans(currentPlans => ({
+            ...currentPlans,
+            [clientId]: plan,
+        }));
+    };
+
     const renderScreen = () => {
         if (!userProfile) {
             return <ProfileSelectorScreen onSelectProfile={handleSelectProfile} />;
@@ -58,7 +70,7 @@ export default function App() {
                 case 'clientDetail':
                     return <ClientDetailScreen client={selectedClient} onNavigate={handleNavigation} />;
                 case 'createMealPlan':
-                    return <CreateMealPlanScreen client={selectedClient} onNavigate={handleNavigation} />;
+                    return <CreateMealPlanScreen client={selectedClient} onNavigate={handleNavigation} onSavePlan={handleSavePlan} />;
                 default:
                     return <ProfessionalDashboardScreen onNavigate={handleNavigation} />;
             }
@@ -76,7 +88,13 @@ export default function App() {
                   return <OnboardingStep3Screen onComplete={handleOnboardingComplete} onNavigate={handleNavigation} userData={userData} />;
                 case 'dashboard':
                   return <DashboardScreen onNavigate={handleNavigation} userData={userData} goals={nutritionGoals} />;
+                case 'mealPlan': { // Adicionamos chavetas aqui para criar um novo escopo
+                    // Assumimos que o consumidor logado tem o id 1 para este exemplo
+                    const consumerPlan = mealPlans[1] || null;
+                    return <MealPlanScreen mealPlan={consumerPlan} onNavigate={handleNavigation} />;
+                }
                 default:
+                    // Se algo der errado, volta para o ecrã de boas-vindas
                     return <WelcomeScreen onNavigate={handleNavigation} />;
             }
         }
