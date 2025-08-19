@@ -1,3 +1,4 @@
+// Define a estrutura de um objeto de Cliente
 export interface Client {
   id: number;
   name: string;
@@ -7,4 +8,18 @@ export interface Client {
   weight: number;
   goal: string;
   activityLevel: string;
+}
+
+// Define a estrutura de um único alimento no plano
+export interface Food {
+    id: number;
+    name: string;
+    quantity: string;
+}
+
+// Define a estrutura de uma refeição, que contém vários alimentos
+export interface Meal {
+    id: number;
+    name: string;
+    foods: Food[];
 }
