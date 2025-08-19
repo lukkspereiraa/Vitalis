@@ -26,3 +26,11 @@ export interface Meal {
     name: string;
     foods: Food[];
 }
+
+// Define os dias da semana que podemos usar
+export type DayOfWeek = 'Segunda' | 'Terça' | 'Quarta' | 'Quinta' | 'Sexta' | 'Sábado' | 'Domingo';
+
+// Define um plano semanal, que é um mapa dos dias para as refeições
+export type WeeklyPlan = {
+    [key in DayOfWeek]?: Meal[];
+};
