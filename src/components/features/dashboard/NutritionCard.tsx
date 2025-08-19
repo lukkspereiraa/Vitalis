@@ -1,8 +1,8 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import Button from '../../ui/Button';
-import type { NutritionGoals } from '../../../utils/nutritionCalculator';
+import Button from '../../ui/Button.tsx';
+import type { NutritionGoals } from '../../../utils/nutritionCalculator.ts';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -48,7 +48,6 @@ const NutritionCard: React.FC<NutritionCardProps> = ({ onNavigate, goals }) => {
         <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-3xl font-bold text-[#212121]">{consumed.calories}</span>
-          {/* Usamos a meta de calorias real! */}
           <span className="text-sm text-[#757575]">/ {goals?.calories || 0} kcal</span>
         </div>
       </div>
@@ -67,7 +66,8 @@ const NutritionCard: React.FC<NutritionCardProps> = ({ onNavigate, goals }) => {
         </div>
       </div>
       <div className="mt-auto pt-6">
-        <Button onClick={() => onNavigate('nutritionDetail')}>
+        {/* CORREÇÃO AQUI: Mudamos 'nutritionDetail' para 'mealPlan' */}
+        <Button onClick={() => onNavigate('mealPlan')}>
             Ver Diário Completo
         </Button>
       </div>

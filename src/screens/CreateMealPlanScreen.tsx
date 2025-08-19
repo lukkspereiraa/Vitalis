@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Button from '../components/ui/Button';
-import MealBuilderCard from '../components/features/professional/MealBuilderCard';
-import type { Client, Meal, Food } from '../types';
+import Button from '../components/ui/Button.tsx';
+import MealBuilderCard from '../components/features/professional/MealBuilderCard.tsx';
+import type { Client, Meal, Food } from '../types/index.ts';
 
 const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -13,11 +13,14 @@ const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
 type CreateMealPlanProps = {
   client: Client | null;
   onNavigate: (screen: string) => void;
+  onSavePlan: (clientId: number, plan: Meal[]) => void;
 };
 
-const CreateMealPlanScreen: React.FC<CreateMealPlanProps> = ({ client, onNavigate }) => {
+// --- Componente de Ecrã ---
+const CreateMealPlanScreen: React.FC<CreateMealPlanProps> = ({ client, onNavigate, onSavePlan }) => {
+  // Estado para guardar todo o plano alimentar
   const [mealPlan, setMealPlan] = useState<Meal[]>([
-    { id: 1, name: 'Pequeno-almoço', foods: [] },
+    { id: 1, name: 'Café da manha', foods: [] },
     { id: 2, name: 'Almoço', foods: [] },
     { id: 3, name: 'Jantar', foods: [] },
   ]);
@@ -28,7 +31,7 @@ const CreateMealPlanScreen: React.FC<CreateMealPlanProps> = ({ client, onNavigat
       currentPlan.map(meal => {
         if (meal.id === mealId) {
           const newFood: Food = {
-            id: Date.now(), 
+            id: Date.now(), // ID único baseado no tempo
             name: foodName,
             quantity: `${quantity}g`,
           };
@@ -53,7 +56,8 @@ const CreateMealPlanScreen: React.FC<CreateMealPlanProps> = ({ client, onNavigat
   
   // Função para "salvar" o plano
   const handleSavePlan = () => {
-    console.log("Plano Alimentar Salvo:", mealPlan);
+    if (!client) return;
+    onSavePlan(client.id, mealPlan);
     onNavigate('clientDetail');
   };
 
