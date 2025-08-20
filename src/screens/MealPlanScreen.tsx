@@ -23,16 +23,16 @@ const CameraIcon = (props: React.SVGProps<SVGSVGElement>) => (
 type MealPlanProps = {
   prescribedPlan: WeeklyPlan | null;
   onNavigate: (screen: string) => void;
+  onLogFood: (food: Food, isAdding: boolean) => void;
+  checkedFoods: Record<number, boolean>;
 };
 
 const DAYS_OF_WEEK: DayOfWeek[] = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
-const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate }) => {
+const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, onLogFood, checkedFoods }) => {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Segunda');
   const [userAddedMeals, setUserAddedMeals] = useState<Meal[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Estados para os campos do formulário do modal
   const [newMealName, setNewMealName] = useState('');
   const [newFoodName, setNewFoodName] = useState('');
   const [newFoodQuantity, setNewFoodQuantity] = useState('');
@@ -41,6 +41,11 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate })
   const [fat, setFat] = useState('');
 
   const mealsForSelectedDay = prescribedPlan?.[selectedDay] || [];
+
+  const handleToggleFood = (food: Food) => {
+    const isCurrentlyChecked = !!checkedFoods[food.id];
+    onLogFood(food, !isCurrentlyChecked);
+  };
 
   const handleAddUserMeal = () => {
     if (newMealName.trim() && newFoodName.trim() && newFoodQuantity.trim()) {
@@ -81,8 +86,8 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate })
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#212121]">Seu Plano Alimentar</h1>
-        <p className="text-md text-[#757575]">Veja o plano do seu nutricionista e registre suas refeições.</p>
+        <h1 className="text-3xl font-bold text-[#212121]">Seu Diário Alimentar</h1>
+        <p className="text-md text-[#757575]">Marque os alimentos que você consumiu hoje.</p>
       </div>
 
       <div className="mb-6">
@@ -92,7 +97,13 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate })
       <div className="space-y-6">
         <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Plano do Nutricionista</h2>
         {mealsForSelectedDay.length > 0 ? (
-          mealsForSelectedDay.map(meal => <MealDisplayCard key={meal.id} meal={meal} />)
+          mealsForSelectedDay.map(meal => 
+            <MealDisplayCard 
+                key={meal.id} 
+                meal={meal} 
+                checkedFoods={checkedFoods} 
+                onToggleFood={handleToggleFood}
+            />)
         ) : (
           <div className="bg-white p-6 rounded-xl shadow-sm text-center">
             <p className="text-gray-600">Nenhuma refeição prescrita para {selectedDay}.</p>
@@ -101,7 +112,13 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate })
 
         <h2 className="text-xl font-bold text-gray-800 border-b pb-2 pt-4">Refeições Adicionadas por Você</h2>
          {userAddedMeals.length > 0 ? (
-          userAddedMeals.map(meal => <MealDisplayCard key={meal.id} meal={meal} />)
+          userAddedMeals.map(meal => 
+            <MealDisplayCard 
+                key={meal.id} 
+                meal={meal} 
+                checkedFoods={checkedFoods} 
+                onToggleFood={handleToggleFood}
+            />)
         ) : (
           <div className="bg-white p-6 rounded-xl shadow-sm text-center">
             <p className="text-gray-600">Você ainda não adicionou nenhuma refeição hoje.</p>
@@ -118,21 +135,16 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate })
         </Button>
       </div>
 
-      {/* O Modal agora com o botão de ler tabela nutricional */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Adicionar Refeição">
         <div className="space-y-4">
             <Input label="Nome da Refeição" placeholder="Ex: Lanche da tarde" value={newMealName} onChange={(e) => setNewMealName(e.target.value)} />
-            <Input label="Alimento Consumido" placeholder="Ex: Maçã" value={newFoodName} onChange={(e) => setNewFoodName(e.target.value)} />
-            <Input label="Quantidade (g)" placeholder="150" type="number" value={newFoodQuantity} onChange={(e) => setNewFoodQuantity(e.target.value)} />
-            
-            <div className="pt-2">
-                <Button variant="secondary" onClick={() => console.log('Abrir câmera...')} className="!py-2 text-sm">
-                    <div className="flex items-center justify-center space-x-2">
-                        <CameraIcon />
-                        <span>Ler tabela nutricional</span>
-                    </div>
-                </Button>
+            <div className="relative">
+                <Input label="Alimento Consumido" placeholder="Ex: Maçã" value={newFoodName} onChange={(e) => setNewFoodName(e.target.value)} />
+                <button className="absolute top-[34px] right-3 text-gray-400 hover:text-emerald-600" title="Escanear Tabela Nutricional (em breve)">
+                    <CameraIcon />
+                </button>
             </div>
+            <Input label="Quantidade (g)" placeholder="150" type="number" value={newFoodQuantity} onChange={(e) => setNewFoodQuantity(e.target.value)} />
             
             <p className="text-xs text-gray-500 text-left pt-2">Nutrientes (opcional):</p>
             <div className="grid grid-cols-3 gap-2">
