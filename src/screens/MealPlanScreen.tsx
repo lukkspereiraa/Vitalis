@@ -12,7 +12,6 @@ const ChevronLeftIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-// Ícone da Câmera
 const CameraIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
         <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
@@ -33,6 +32,7 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Segunda');
   const [userAddedMeals, setUserAddedMeals] = useState<Meal[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingFood, setEditingFood] = useState<Food | null>(null);
   
   const [newMealName, setNewMealName] = useState('');
   const [newFoodName, setNewFoodName] = useState('');
@@ -49,15 +49,57 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
     onLogFood(food, !isCurrentlyChecked);
   };
 
-  const handleAddUserMeal = () => {
-    if (newMealName.trim() && newFoodName.trim() && newFoodQuantity.trim()) {
-      const p = parseFloat(protein) || 0;
-      const c = parseFloat(carbs) || 0;
-      const f = parseFloat(fat) || 0;
-      const userCalories = parseFloat(calories) || 0;
+  const openAddModal = () => {
+    setEditingFood(null);
+    setNewMealName('');
+    setNewFoodName('');
+    setNewFoodQuantity('');
+    setProtein('');
+    setCarbs('');
+    setFat('');
+    setCalories('');
+    setIsModalOpen(true);
+  };
+  
+  const openEditModal = (foodToEdit: Food, mealName: string) => {
+    setEditingFood(foodToEdit);
+    setNewMealName(mealName);
+    setNewFoodName(foodToEdit.name);
+    setNewFoodQuantity(foodToEdit.quantity.replace('g', ''));
+    setProtein(foodToEdit.protein?.toString() || '');
+    setCarbs(foodToEdit.carbs?.toString() || '');
+    setFat(foodToEdit.fat?.toString() || '');
+    setCalories(foodToEdit.calories?.toString() || '');
+    setIsModalOpen(true);
+  };
 
-      const finalCalories = userCalories > 0 ? userCalories : (p * 4) + (c * 4) + (f * 9);
+  const handleSaveUserMeal = () => {
+    if (!newMealName.trim() || !newFoodName.trim() || !newFoodQuantity.trim()) return;
 
+    const p = parseFloat(protein) || 0;
+    const c = parseFloat(carbs) || 0;
+    const f = parseFloat(fat) || 0;
+    const userCalories = parseFloat(calories) || 0;
+    const finalCalories = userCalories > 0 ? userCalories : (p * 4) + (c * 4) + (f * 9);
+
+    if (editingFood) {
+      const updatedFood = { 
+        ...editingFood,
+        name: newFoodName,
+        quantity: `${newFoodQuantity}g`,
+        protein: p > 0 ? p : undefined,
+        carbs: c > 0 ? c : undefined,
+        fat: f > 0 ? f : undefined,
+        calories: finalCalories > 0 ? Math.round(finalCalories) : undefined,
+      };
+      
+      const updatedMeals = userAddedMeals.map(meal => ({
+        ...meal,
+        foods: meal.foods.map(food => food.id === editingFood.id ? updatedFood : food)
+      }));
+      setUserAddedMeals(updatedMeals);
+
+    } else {
       const newFood: Food = {
         id: Date.now(),
         name: newFoodName,
@@ -82,16 +124,9 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
         };
         setUserAddedMeals([...userAddedMeals, newMeal]);
       }
-      
-      setNewMealName('');
-      setNewFoodName('');
-      setNewFoodQuantity('');
-      setProtein('');
-      setCarbs('');
-      setFat('');
-      setCalories('');
-      setIsModalOpen(false);
     }
+    
+    setIsModalOpen(false);
   };
 
   return (
@@ -107,35 +142,12 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
 
       <div className="space-y-6">
         <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Plano do Nutricionista</h2>
-        {mealsForSelectedDay.length > 0 ? (
-          mealsForSelectedDay.map(meal => 
-            <MealDisplayCard 
-                key={meal.id} 
-                meal={meal} 
-                checkedFoods={checkedFoods} 
-                onToggleFood={handleToggleFood}
-            />)
-        ) : (
-          <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-            <p className="text-gray-600">Nenhuma refeição prescrita para {selectedDay}.</p>
-          </div>
-        )}
+        {mealsForSelectedDay.map(meal => <MealDisplayCard key={meal.id} meal={meal} checkedFoods={checkedFoods} onToggleFood={handleToggleFood}/>)}
 
         <h2 className="text-xl font-bold text-gray-800 border-b pb-2 pt-4">Refeições Adicionadas por Você</h2>
-         {userAddedMeals.length > 0 ? (
-          userAddedMeals.map(meal => 
-            <MealDisplayCard 
-                key={meal.id} 
-                meal={meal} 
-                checkedFoods={checkedFoods} 
-                onToggleFood={handleToggleFood}
-            />)
-        ) : (
-          <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-            <p className="text-gray-600">Você ainda não adicionou nenhuma refeição hoje.</p>
-          </div>
-        )}
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+        {userAddedMeals.map(meal => <MealDisplayCard key={meal.id} meal={meal} checkedFoods={checkedFoods} onToggleFood={handleToggleFood} onEditFood={openEditModal} />)}
+        
+        <Button variant="primary" onClick={openAddModal}>
             + Adicionar Refeição do Dia
         </Button>
       </div>
@@ -146,11 +158,11 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
         </Button>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Adicionar Refeição">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingFood ? "Editar Alimento" : "Adicionar Refeição"}>
         <div className="space-y-4">
-            <Input label="Nome da Refeição" placeholder="Ex: Lanche da tarde" value={newMealName} onChange={(e) => setNewMealName(e.target.value)} />
+            <Input label="Nome da Refeição" placeholder="Ex: Lanche da tarde" value={newMealName} onChange={(e) => setNewMealName(e.target.value)} disabled={!!editingFood} />
             <Input label="Alimento Consumido" placeholder="Ex: Maçã" value={newFoodName} onChange={(e) => setNewFoodName(e.target.value)} />
-  
+            
             <div className="-mt-2">
                 <Button variant="secondary" onClick={() => console.log('Abrir câmera...')} className="!py-2 text-sm w-full">
                     <div className="flex items-center justify-center space-x-2">
@@ -171,8 +183,8 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
             </div>
 
             <div className="pt-2">
-                <Button onClick={handleAddUserMeal} className="w-full">
-                    Adicionar
+                <Button onClick={handleSaveUserMeal} className="w-full">
+                    {editingFood ? "Salvar Alterações" : "Adicionar"}
                 </Button>
             </div>
         </div>
