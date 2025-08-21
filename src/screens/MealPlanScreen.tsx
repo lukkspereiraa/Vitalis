@@ -33,12 +33,14 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Segunda');
   const [userAddedMeals, setUserAddedMeals] = useState<Meal[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [newMealName, setNewMealName] = useState('');
   const [newFoodName, setNewFoodName] = useState('');
   const [newFoodQuantity, setNewFoodQuantity] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [calories, setCalories] = useState('');
 
   const mealsForSelectedDay = prescribedPlan?.[selectedDay] || [];
 
@@ -49,13 +51,21 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
 
   const handleAddUserMeal = () => {
     if (newMealName.trim() && newFoodName.trim() && newFoodQuantity.trim()) {
+      const p = parseFloat(protein) || 0;
+      const c = parseFloat(carbs) || 0;
+      const f = parseFloat(fat) || 0;
+      const userCalories = parseFloat(calories) || 0;
+
+      const finalCalories = userCalories > 0 ? userCalories : (p * 4) + (c * 4) + (f * 9);
+
       const newFood: Food = {
         id: Date.now(),
         name: newFoodName,
         quantity: `${newFoodQuantity}g`,
-        protein: protein ? parseFloat(protein) : undefined,
-        carbs: carbs ? parseFloat(carbs) : undefined,
-        fat: fat ? parseFloat(fat) : undefined,
+        protein: p > 0 ? p : undefined,
+        carbs: c > 0 ? c : undefined,
+        fat: f > 0 ? f : undefined,
+        calories: finalCalories > 0 ? Math.round(finalCalories) : undefined,
       };
       
       const existingMealIndex = userAddedMeals.findIndex(meal => meal.name.toLowerCase() === newMealName.trim().toLowerCase());
@@ -79,6 +89,7 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
       setProtein('');
       setCarbs('');
       setFat('');
+      setCalories('');
       setIsModalOpen(false);
     }
   };
@@ -138,19 +149,25 @@ const MealPlanScreen: React.FC<MealPlanProps> = ({ prescribedPlan, onNavigate, o
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Adicionar Refeição">
         <div className="space-y-4">
             <Input label="Nome da Refeição" placeholder="Ex: Lanche da tarde" value={newMealName} onChange={(e) => setNewMealName(e.target.value)} />
-            <div className="relative">
-                <Input label="Alimento Consumido" placeholder="Ex: Maçã" value={newFoodName} onChange={(e) => setNewFoodName(e.target.value)} />
-                <button className="absolute top-[34px] right-3 text-gray-400 hover:text-emerald-600" title="Escanear Tabela Nutricional (em breve)">
-                    <CameraIcon />
-                </button>
+            <Input label="Alimento Consumido" placeholder="Ex: Maçã" value={newFoodName} onChange={(e) => setNewFoodName(e.target.value)} />
+  
+            <div className="-mt-2">
+                <Button variant="secondary" onClick={() => console.log('Abrir câmera...')} className="!py-2 text-sm w-full">
+                    <div className="flex items-center justify-center space-x-2">
+                        <CameraIcon />
+                        <span>Escanear tabela nutricional</span>
+                    </div>
+                </Button>
             </div>
+
             <Input label="Quantidade (g)" placeholder="150" type="number" value={newFoodQuantity} onChange={(e) => setNewFoodQuantity(e.target.value)} />
             
             <p className="text-xs text-gray-500 text-left pt-2">Nutrientes (opcional):</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <Input label="Proteína (g)" type="number" placeholder="-" value={protein} onChange={(e) => setProtein(e.target.value)} />
                 <Input label="Carboidrato (g)" type="number" placeholder="-" value={carbs} onChange={(e) => setCarbs(e.target.value)} />
                 <Input label="Gordura (g)" type="number" placeholder="-" value={fat} onChange={(e) => setFat(e.target.value)} />
+                <Input label="Calorias (kcal)" type="number" placeholder="-" value={calories} onChange={(e) => setCalories(e.target.value)} />
             </div>
 
             <div className="pt-2">

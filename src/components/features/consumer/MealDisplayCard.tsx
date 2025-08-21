@@ -4,8 +4,8 @@ import type { Meal, Food } from '../../../types/index.ts';
 // --- Tipos ---
 type MealDisplayCardProps = {
   meal: Meal;
-  checkedFoods: Record<number, boolean>; 
-  onToggleFood: (food: Food) => void; 
+  checkedFoods: Record<number, boolean>;
+  onToggleFood: (food: Food) => void;
 };
 
 // --- Componente ---
@@ -28,21 +28,32 @@ const MealDisplayCard: React.FC<MealDisplayCardProps> = ({ meal, checkedFoods, o
                         onChange={() => onToggleFood(food)}
                         className="h-5 w-5 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300"
                     />
-                    <span className={`text-gray-700 ${checkedFoods[food.id] ? 'line-through text-gray-400' : ''}`}>
-                        {food.name}
+                    <div>
+                        <span className={`text-gray-700 ${checkedFoods[food.id] ? 'line-through text-gray-400' : ''}`}>
+                            {food.name}
+                        </span>
+                        {/* Exibe os macros se eles existirem */}
+                        {(food.protein !== undefined || food.carbs !== undefined || food.fat !== undefined) && (
+                            <div className="text-xs text-gray-500 mt-1">
+                            <span className="font-semibold text-emerald-600">P:</span> {food.protein || 0}g,&nbsp;
+                            <span className="font-semibold text-amber-500">C:</span> {food.carbs || 0}g,&nbsp;
+                            <span className="font-semibold text-red-500">G:</span> {food.fat || 0}g
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="text-right">
+                    <span className={`font-medium ${checkedFoods[food.id] ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                        {food.quantity}
                     </span>
+
+                    {food.calories && (
+                        <p className={`text-sm font-bold ${checkedFoods[food.id] ? 'line-through text-gray-400' : 'text-emerald-600'}`}>
+                            {food.calories} kcal
+                        </p>
+                    )}
                 </div>
-                <span className={`font-medium ${checkedFoods[food.id] ? 'line-through text-gray-400' : 'text-gray-600'}`}>
-                    {food.quantity}
-                </span>
               </div>
-              {(food.protein !== undefined || food.carbs !== undefined || food.fat !== undefined) && (
-                <div className="text-xs text-gray-500 mt-1 pl-8">
-                  <span className="font-semibold text-emerald-600">P:</span> {food.protein || 0}g,&nbsp;
-                  <span className="font-semibold text-amber-500">C:</span> {food.carbs || 0}g,&nbsp;
-                  <span className="font-semibold text-red-500">G:</span> {food.fat || 0}g
-                </div>
-              )}
             </li>
           ))
         )}
