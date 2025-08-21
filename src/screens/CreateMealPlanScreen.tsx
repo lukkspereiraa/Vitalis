@@ -52,6 +52,19 @@ const CreateMealPlanScreen: React.FC<CreateMealPlanProps> = ({ client, onNavigat
     setWeeklyPlan(currentPlan => ({ ...currentPlan, [selectedDay]: updatedMeals }));
   };
 
+  const handleUpdateFood = (mealId: number, updatedFood: Food) => {
+    const updatedMeals = mealsForSelectedDay.map(meal => {
+        if (meal.id === mealId) {
+            return { 
+                ...meal, 
+                foods: meal.foods.map(food => food.id === updatedFood.id ? updatedFood : food)
+            };
+        }
+        return meal;
+    });
+    setWeeklyPlan(currentPlan => ({ ...currentPlan, [selectedDay]: updatedMeals }));
+  };
+
   const handleAddMeal = () => {
     if (newMealName.trim()) {
       const newMeal: Meal = { id: Date.now(), name: newMealName, foods: [] };
@@ -86,7 +99,12 @@ const CreateMealPlanScreen: React.FC<CreateMealPlanProps> = ({ client, onNavigat
       <div className="space-y-6">
         {mealsForSelectedDay.map(meal => (
           <div key={meal.id} className="relative group">
-            <MealBuilderCard meal={meal} onAddFood={handleAddFood} onRemoveFood={handleRemoveFood} />
+            <MealBuilderCard 
+              meal={meal} 
+              onAddFood={handleAddFood} 
+              onRemoveFood={handleRemoveFood}
+              onUpdateFood={handleUpdateFood}
+            />
             <button onClick={() => handleRemoveMeal(meal.id)} className="absolute top-3 right-3 text-gray-400 hover:text-red-600 p-1 rounded-full bg-white/50 hover:bg-red-100 transition-all opacity-0 group-hover:opacity-100" title="Remover Refeição">
               <TrashIcon />
             </button>
